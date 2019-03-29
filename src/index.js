@@ -101,6 +101,7 @@ class Main extends React.Component {
                         <div className="product-description">{product.description}</div>
                         <div className="product-price">{product.price} ETH</div>
                         <div className="product-quantity">{product.quantity} units</div>
+                        <button className="product-buy" type="button">Buy</button>
                     </div>
                 </div>
             ))
@@ -111,6 +112,7 @@ class Main extends React.Component {
     render() {
         return (
             <div>
+                <div className="header">ECOMMERCE</div>
                 <div className="products-container">{this.state.productsHtml}</div>
             </div>
         )

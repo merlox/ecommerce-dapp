@@ -3,6 +3,24 @@ productPadding = 20px
 body
     background-color: whitesmoke
     font-family: sans-serif
+    margin: 0
+
+button
+    border: none
+    background-color: black
+    color: white
+    cursor: pointer
+    padding: 10px
+
+    &:hover
+        opacity: 0.9
+
+.header
+    background-color: black
+    color: white
+    padding: 15px
+    margin-bottom: 20px
+    text-align: center
 
 .products-container
     display: grid
@@ -13,7 +31,7 @@ body
 
     .product
         width: 400px
-        border: 1px solid grey
+        border: 1px solid black
 
         .product-image
             width: 100%
@@ -23,7 +41,7 @@ body
         .product-data
             display: grid
             grid-template-columns: 1fr 1fr
-            grid-template-rows: 70px 20%
+            grid-template-rows: 50px 20px 40px
             align-items: center
             padding: 10px productPadding
             grid-column-gap: productPadding
@@ -37,3 +55,7 @@ body
 
             .product-quantity
                 font-size: 11pt
+
+            .product-buy
+                width: 200px
+                grid-column: 2 / 3
