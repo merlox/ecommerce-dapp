@@ -1,2 +1,39 @@
+productPadding = 20px
+
 body
     background-color: whitesmoke
+    font-family: sans-serif
+
+.products-container
+    display: grid
+    width: 80%
+    margin: auto
+    grid-template-columns: 1fr 1fr 1fr
+    justify-items: center
+
+    .product
+        width: 400px
+        border: 1px solid grey
+
+        .product-image
+            width: 100%
+            grid-column: 1 / 3
+            box-shadow: 0 3px 0px 0 lightgrey
+
+        .product-data
+            display: grid
+            grid-template-columns: 1fr 1fr
+            grid-template-rows: 70px 20%
+            align-items: center
+            padding: 10px productPadding
+            grid-column-gap: productPadding
+            background-color: white
+
+            .product-description
+                font-size: 10pt
+
+            .product-price
+                font-size: 11pt
+
+            .product-quantity
+                font-size: 11pt

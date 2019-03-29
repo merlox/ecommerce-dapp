@@ -1,4 +1,5 @@
 require('babel-polyfill')
+const webpack = require('webpack')
 const html = require('html-webpack-plugin')
 const path = require('path')
 
@@ -34,6 +35,7 @@ module.exports = {
         ]
     },
     plugins: [
+        new webpack.HotModuleReplacementPlugin(),
         new html({
             title: "dApp project",
             template: './src/index.ejs',

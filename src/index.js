@@ -35,31 +35,31 @@ class Main extends React.Component {
         this.state = {
             products: [{
                 id: 1,
-                title: 'This is a cool cat',
-                description: 'Turkish Van cat for sale',
-                published: Date.now(),
+                title: 'Clasic trendy shoes',
+                description: 'New unique shoes for sale',
+                date: Date.now(),
                 owner: '',
-                price: 100,
+                price: 12,
                 quantity: 10,
-                image: 'https://en.wikipedia.org/wiki/Turkish_Van#/media/File:Push_van_cat.jpg'
+                image: 'https://cdn.shopify.com/s/files/1/2494/8702/products/Bjakin-2018-Socks-Running-Shoes-for-Men-Lightweight-Sports-Sneakers-Colors-Man-Sock-Walking-Shoes-Big_17fa0d5b-d9d9-46a0-bdea-ac2dc17474ce_400x.jpg?v=1537755930'
             }, {
                 id: 2,
-                title: 'Papillon Book',
-                description: 'The famous autobiography by Henri',
-                published: Date.now(),
+                title: 'Flat heel shoes',
+                description: 'For women yellow spring shoes',
+                date: Date.now(),
                 owner: '',
-                price: 100,
+                price: 62,
                 quantity: 10,
-                image: 'https://en.wikipedia.org/wiki/Papillon_(book)#/media/File:PapillonBook.jpg'
+                image: 'https://ae01.alicdn.com/kf/HTB10VmYPFXXXXckXFXXq6xXFXXXY/Spring-and-Autumn-Flats-Women-Flat-heel-Shoes-Fashion-Leopard-Flats-Women-Shoes-Casual-Soft-Comfortable.jpg_640x640.jpg'
             }, {
                 id: 3,
-                title: 'Smart Ebike',
-                description: 'A powerful ebike with smart utilities for better performance',
-                published: Date.now(),
+                title: 'White shoes unisex',
+                description: 'General white shoes for common use',
+                date: Date.now(),
                 owner: '',
-                price: 100,
+                price: 28,
                 quantity: 10,
-                image: 'https://commons.wikimedia.org/wiki/Category:Smart_ebike#/media/File:Geneva_MotorShow_2013_-_Smart_electric_bike_left_view.jpg'
+                image: 'http://www.cottageartcreations.com/wp-content/uploads/2017/09/white-shoes-aliexpress-com-buy-new-men-flat-shoes-spring-autumn-black-white-man-srjqhnn-.jpg'
             }],
             productsHtml: []
         }
@@ -94,9 +94,14 @@ class Main extends React.Component {
         let productsHtml = []
         await this.state.products.asyncForEach(product => {
             productsHtml.push((
-                <div key={product.id}>
-                    {product.title}
-                    {product.description}
+                <div key={product.id} className="product">
+                    <img className="product-image" src={product.image} />
+                    <div className="product-data">
+                        <h3 className="product-title">{product.title}</h3>
+                        <div className="product-description">{product.description}</div>
+                        <div className="product-price">{product.price} ETH</div>
+                        <div className="product-quantity">{product.quantity} units</div>
+                    </div>
                 </div>
             ))
         })
@@ -105,7 +110,9 @@ class Main extends React.Component {
 
     render() {
         return (
-            <div>{this.state.productsHtml}</div>
+            <div>
+                <div className="products-container">{this.state.productsHtml}</div>
+            </div>
         )
     }
 }
