@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import MyWeb3 from 'web3'
 import { BrowserRouter, Link, Route } from 'react-router-dom'
+import { createBrowserHistory } from 'history'
 import Home from './components/Home'
 import Product from './components/Product'
 import Sell from './components/Sell'
@@ -26,8 +27,10 @@ import './index.styl'
 // - Image URL
 
 class Main extends React.Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
+
+        console.log(this.props.history)
 
         this.state = {
             products: [{
@@ -59,13 +62,12 @@ class Main extends React.Component {
                 image: 'http://www.cottageartcreations.com/wp-content/uploads/2017/09/white-shoes-aliexpress-com-buy-new-men-flat-shoes-spring-autumn-black-white-man-srjqhnn-.jpg'
             }],
             productsHtml: [],
-            productDetails: []
+            productDetails: [],
         }
 
         this.setup()
     }
 
-    // To use bytes32 functions
     bytes32(name) {
         return myWeb3.utils.fromAscii(name)
     }
@@ -100,7 +102,7 @@ class Main extends React.Component {
                         <div className="product-price">{product.price} ETH</div>
                         <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
-                            this.productDetails(product)
+                            this.setState({product})
                         }} className="product-view" type="button">View</button>
                     </div>
                 </div>
@@ -109,42 +111,25 @@ class Main extends React.Component {
         this.setState({productsHtml})
     }
 
-    async productDetails(product) {
-        let productDetails = (
-            <div>
-                <div className="product-details">
-                    <img className="product-image" src={product.image} />
-                    <div className="product-data">
-                        <h3 className="product-title">{product.title}</h3>
-                        <ul className="product-description">
-                            {product.description.split('\n').map((line, index) => (
-                                <li key={index}>{line}</li>
-                            ))}
-                        </ul>
-                        <div className="product-data-container">
-                            <div className="product-price">{product.price} ETH</div>
-                            <div className="product-quantity">{product.quantity} units available</div>
-                        </div>
-                        <button className="product-buy" type="button">Buy</button>
-                    </div>
-                </div>
-                <hr/>
-            </div>
-        )
-        this.setState({productDetails})
-    }
+    redirectTo(history, location) {
+		history.push({
+			pathname: location
+		})
+	}
 
     render() {
         return (
             <div>
                 <Route path="/product" render={() => (
-                    <Product />
+                    <Product product={this.state.product} />
                 )}/>
                 <Route path="/sell" render={() => (
                     <Sell />
                 )}/>
-                <Route path="/" exact render={() => (
-                    <Home productsHtml={this.state.productsHtml} />
+                <Route path="/" exact render={context => (
+                    <Home
+                        productsHtml={this.state.productsHtml}
+                    />
                 )} />
             </div>
         )
@@ -153,6 +138,6 @@ class Main extends React.Component {
 
 ReactDOM.render(
     <BrowserRouter>
-        <Main />
+        <Main history={history.push} />
     </BrowserRouter>,
 document.querySelector('#root'))
