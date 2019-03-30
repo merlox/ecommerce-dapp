@@ -54,14 +54,15 @@ class Main extends React.Component {
             }, {
                 id: 3,
                 title: 'White shoes unisex',
-                description: 'General white shoes for common use',
+                description: "100% Synthetic Imported \nRubber sole \nShaft measures approximately Low-Top from arch \nLace-up skate shoe with smooth abrasion-resistant upper featuring signature 3-Stripes logoing and wraparound midsole \nGrippy vulcanized rubber outsole sticks to board for control",
                 date: Date.now(),
                 owner: '',
                 price: 28,
                 quantity: 10,
                 image: 'http://www.cottageartcreations.com/wp-content/uploads/2017/09/white-shoes-aliexpress-com-buy-new-men-flat-shoes-spring-autumn-black-white-man-srjqhnn-.jpg'
             }],
-            productsHtml: []
+            productsHtml: [],
+            productDetails: []
         }
 
         this.setup()
@@ -98,10 +99,12 @@ class Main extends React.Component {
                     <img className="product-image" src={product.image} />
                     <div className="product-data">
                         <h3 className="product-title">{product.title}</h3>
-                        <div className="product-description">{product.description}</div>
+                        <div className="product-description">{product.description.substring(0, 50) + '...'}</div>
                         <div className="product-price">{product.price} ETH</div>
-                        <div className="product-quantity">{product.quantity} units</div>
-                        <button className="product-buy" type="button">Buy</button>
+                        <div className="product-quantity">{product.quantity} units available</div>
+                        <button onClick={() => {
+                            this.productDetails(product)
+                        }} className="product-view" type="button">View</button>
                     </div>
                 </div>
             ))
@@ -109,11 +112,38 @@ class Main extends React.Component {
         this.setState({productsHtml})
     }
 
+    async productDetails(product) {
+        let productDetails = (
+            <div>
+                <div className="product-details">
+                    <img className="product-image" src={product.image} />
+                    <div className="product-data">
+                        <h3 className="product-title">{product.title}</h3>
+                        <ul className="product-description">
+                            {product.description.split('\n').map((line, index) => (
+                                <li key={index}>{line}</li>
+                            ))}
+                        </ul>
+                        <div className="product-data-container">
+                            <div className="product-price">{product.price} ETH</div>
+                            <div className="product-quantity">{product.quantity} units available</div>
+                        </div>
+                        <button className="product-buy" type="button">Buy</button>
+                    </div>
+                </div>
+                <hr/>
+            </div>
+        )
+        this.setState({productDetails})
+    }
+
     render() {
         return (
             <div>
                 <div className="header">ECOMMERCE</div>
+                {this.state.productDetails}
                 <div className="products-container">{this.state.productsHtml}</div>
+                <div className="spacer"></div>
             </div>
         )
     }
