@@ -5,8 +5,10 @@ function Header() {
     return (
         <div className="header">
             ECOMMERCE
-            <Link to="/">Home</Link>
-            <Link to="/sell">Sell</Link>
+            <div>
+                <Link to="/">Home</Link>
+                <Link to="/sell">Sell</Link>
+            </div>
         </div>
     )
 }
