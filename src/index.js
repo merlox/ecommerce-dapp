@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import MyWeb3 from 'web3'
-import { BrowserRouter, Link, Route } from 'react-router-dom'
-import { createBrowserHistory } from 'history'
+import { BrowserRouter, Link, Route, withRouter } from 'react-router-dom'
 import Home from './components/Home'
 import Product from './components/Product'
 import Sell from './components/Sell'
@@ -29,8 +28,6 @@ import './index.styl'
 class Main extends React.Component {
     constructor(props) {
         super(props)
-
-        console.log(this.props.history)
 
         this.state = {
             products: [{
@@ -103,6 +100,7 @@ class Main extends React.Component {
                         <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
                             this.setState({product})
+                            this.redirectTo(this.props.history, '/product')
                         }} className="product-view" type="button">View</button>
                     </div>
                 </div>
@@ -136,8 +134,11 @@ class Main extends React.Component {
     }
 }
 
+// To be able to access the history in order to redirect users programatically when openning a product
+Main = withRouter(Main)
+
 ReactDOM.render(
     <BrowserRouter>
-        <Main history={history.push} />
+        <Main />
     </BrowserRouter>,
 document.querySelector('#root'))
