@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import MyWeb3 from 'web3'
-import { BrowserRouter, Link, Route, withRouter } from 'react-router-dom'
+import { BrowserRouter, Route, withRouter } from 'react-router-dom'
 import Home from './components/Home'
 import Product from './components/Product'
 import Sell from './components/Sell'
