@@ -25,7 +25,6 @@ class Product extends React.Component {
                         }} className="product-buy" type="button">Buy</button>
                     </div>
                 </div>
-                <hr/>
             </div>
         )
     }
