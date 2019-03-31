@@ -61,6 +61,7 @@ class Main extends React.Component {
             }],
             productsHtml: [],
             productDetails: [],
+            product: {},
         }
 
         this.setup()
@@ -129,10 +130,14 @@ class Main extends React.Component {
                     <Sell />
                 )}/>
                 <Route path="/buy" render={() => (
-                    <Buy />
+                    <Buy
+                        product={this.state.product}
+                    />
                 )} />
                 <Route path="/" exact render={context => (
-                    <Home productsHtml={this.state.productsHtml} />
+                    <Home
+                        productsHtml={this.state.productsHtml}
+                    />
                 )} />
             </div>
         )
