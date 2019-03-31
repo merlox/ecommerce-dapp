@@ -150,7 +150,7 @@ class Main extends React.Component {
                         redirectTo={location => this.redirectTo(location)}
                     />
                 )} />
-                <Route path="/" exact render={context => (
+                <Route path="/" exact render={() => (
                     <Home
                         productsHtml={this.state.productsHtml}
                     />
@@ -160,7 +160,7 @@ class Main extends React.Component {
     }
 }
 
-// To be able to access the history in order to redirect users programatically when openning a product
+// To be able to access the history in order to redirect users programatically when opening a product
 Main = withRouter(Main)
 
 ReactDOM.render(
