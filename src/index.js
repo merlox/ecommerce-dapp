@@ -145,7 +145,10 @@ class Main extends React.Component {
                     />
                 )} />
                 <Route path="/orders" render={() => (
-                    <Orders />
+                    <Orders
+                        setState={state => this.setState(state)}
+                        redirectTo={location => this.redirectTo(location)}
+                    />
                 )} />
                 <Route path="/" exact render={context => (
                     <Home
