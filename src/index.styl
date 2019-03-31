@@ -163,13 +163,30 @@ input, textarea
 
 .orders-page
     display: grid
-    grid-template-columns: repeat(4, 1fr)
+    grid-template-columns: repeat(2, 1fr)
     width: 70%
     margin: auto
+
+    >div:last-child
+        margin-bottom: 100px
+
+    .order-title
+        text-align: center
+        font-size: 12pt
 
     .product
         display: grid
         margin-bottom: 20px
+        grid-template-columns: 1fr 1fr
 
         .product-image
             height: 150px
+            justify-self: right
+            margin-right: 20px
+
+        .product-title
+            margin-top: 0
+            margin-bottom: 7px
+
+        &:last-child
+            margin-bottom: 40px

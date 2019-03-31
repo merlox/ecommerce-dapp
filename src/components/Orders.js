@@ -72,7 +72,8 @@ class Orders extends Component {
                     <img className="product-image" src={product.image} />
                     <div className="product-data">
                         <h3 className="product-title">{product.title}</h3>
-                        <div className="product-description">{product.description.substring(0, 50) + '...'}</div>
+                        <div className="product-state">State: {product.state}</div>
+                        <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
                         <div className="product-price">{product.price} ETH</div>
                         <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
@@ -91,7 +92,8 @@ class Orders extends Component {
                     <img className="product-image" src={product.image} />
                     <div className="product-data">
                         <h3 className="product-title">{product.title}</h3>
-                        <div className="product-description">{product.description.substring(0, 50) + '...'}</div>
+                        <div className="product-state">State: {product.state}</div>
+                        <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
                         <div className="product-price">{product.price} ETH</div>
                         <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
@@ -113,22 +115,22 @@ class Orders extends Component {
                 <Header />
                 <div className="orders-page">
                     <div>
-                        <h3>Pending orders as a seller</h3>
+                        <h3 className="order-title">PENDING ORDERS AS A SELLER</h3>
                         {this.state.pendingSellOrdersHtml}
                     </div>
 
                     <div>
-                        <h3>Pending orders as a buyer</h3>
+                        <h3 className="order-title">PENDING ORDERS AS A BUYER</h3>
                         {this.state.pendingBuyOrdersHtml}
                     </div>
 
                     <div>
-                        <h3>Completed sell orders</h3>
+                        <h3 className="order-title">COMPLETED SELL ORDERS</h3>
                         {this.state.completedSellOrdersHtml}
                     </div>
 
                     <div>
-                        <h3>Completed buy orders</h3>
+                        <h3 className="order-title">COMPLETED BUY ORDERS</h3>
                         {this.state.completedBuyOrdersHtml}
                     </div>
                 </div>
