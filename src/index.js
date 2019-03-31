@@ -6,6 +6,7 @@ import Home from './components/Home'
 import Product from './components/Product'
 import Sell from './components/Sell'
 import Header from './components/Header'
+import Buy from './components/Buy'
 
 import './index.styl'
 
@@ -100,7 +101,7 @@ class Main extends React.Component {
                         <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
                             this.setState({product})
-                            this.redirectTo(this.props.history, '/product')
+                            this.redirectTo('/product')
                         }} className="product-view" type="button">View</button>
                     </div>
                 </div>
@@ -109,8 +110,8 @@ class Main extends React.Component {
         this.setState({productsHtml})
     }
 
-    redirectTo(history, location) {
-		history.push({
+    redirectTo(location) {
+		this.props.history.push({
 			pathname: location
 		})
 	}
@@ -119,15 +120,19 @@ class Main extends React.Component {
         return (
             <div>
                 <Route path="/product" render={() => (
-                    <Product product={this.state.product} />
+                    <Product
+                        product={this.state.product}
+                        redirectTo={location => this.redirectTo(location)}
+                    />
                 )}/>
                 <Route path="/sell" render={() => (
                     <Sell />
                 )}/>
+                <Route path="/buy" render={() => (
+                    <Buy />
+                )} />
                 <Route path="/" exact render={context => (
-                    <Home
-                        productsHtml={this.state.productsHtml}
-                    />
+                    <Home productsHtml={this.state.productsHtml} />
                 )} />
             </div>
         )
