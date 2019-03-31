@@ -2,15 +2,6 @@ import React from 'react'
 import MyWeb3 from 'web3'
 import Header from './Header'
 
-Array.prototype.asyncForEach = function (callback) {
-    return new Promise(resolve => {
-        for(let i = 0; i < this.length; i++) {
-            callback(this[i], i, this)
-        }
-        resolve()
-    })
-}
-
 class Home extends React.Component {
     constructor() { super() }
     render() {

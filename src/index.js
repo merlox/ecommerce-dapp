@@ -27,6 +27,15 @@ import './index.styl'
 // - Quantity
 // - Image URL
 
+Array.prototype.asyncForEach = function (callback) {
+    return new Promise(resolve => {
+        for(let i = 0; i < this.length; i++) {
+            callback(this[i], i, this)
+        }
+        resolve()
+    })
+}
+
 class Main extends React.Component {
     constructor(props) {
         super(props)

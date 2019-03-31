@@ -55,12 +55,56 @@ class Orders extends Component {
             completedSellOrdersHtml: [],
             completedBuyOrdersHtml: [],
         }
+
+        this.displayOrders()
     }
 
     async getUserOrders() {}
 
     async displayOrders() {
-
+        let pendingSellOrdersHtml = []
+        let pendingBuyOrdersHtml = []
+        let completedSellOrdersHtml = []
+        let completedBuyOrdersHtml = []
+        await this.state.sellOrders.asyncForEach(product => {
+            let html = (
+                <div key={product.id} className="product">
+                    <img className="product-image" src={product.image} />
+                    <div className="product-data">
+                        <h3 className="product-title">{product.title}</h3>
+                        <div className="product-description">{product.description.substring(0, 50) + '...'}</div>
+                        <div className="product-price">{product.price} ETH</div>
+                        <div className="product-quantity">{product.quantity} units available</div>
+                        <button onClick={() => {
+                            this.props.setState({product})
+                            this.props.redirectTo('/product')
+                        }} className="product-view" type="button">View</button>
+                    </div>
+                </div>
+            )
+            if(product.state = 'pending') pendingSellOrdersHtml.push(html)
+            if(product.state = 'completed') completedSellOrdersHtml.push(html)
+        })
+        await this.state.buyOrders.asyncForEach(product => {
+            let html = (
+                <div key={product.id} className="product">
+                    <img className="product-image" src={product.image} />
+                    <div className="product-data">
+                        <h3 className="product-title">{product.title}</h3>
+                        <div className="product-description">{product.description.substring(0, 50) + '...'}</div>
+                        <div className="product-price">{product.price} ETH</div>
+                        <div className="product-quantity">{product.quantity} units available</div>
+                        <button onClick={() => {
+                            this.props.setState({product})
+                            this.props.redirectTo('/product')
+                        }} className="product-view" type="button">View</button>
+                    </div>
+                </div>
+            )
+            if(product.state = 'pending') pendingBuyOrdersHtml.push(html)
+            if(product.state = 'completed') completedBuyOrdersHtml.push(html)
+        })
+        this.setState({pendingSellOrdersHtml, pendingBuyOrdersHtml, completedSellOrdersHtml, completedBuyOrdersHtml})
     }
 
     render() {
@@ -68,17 +112,25 @@ class Orders extends Component {
             <div>
                 <Header />
                 <div className="orders-page">
-                    <h3>Pending orders as a seller</h3>
-                    {this.state.pendingSellOrdersHtml}
+                    <div>
+                        <h3>Pending orders as a seller</h3>
+                        {this.state.pendingSellOrdersHtml}
+                    </div>
 
-                    <h3>Pending orders as a buyer</h3>
-                    {this.state.pendingBuyOrdersHtml}
+                    <div>
+                        <h3>Pending orders as a buyer</h3>
+                        {this.state.pendingBuyOrdersHtml}
+                    </div>
 
-                    <h3>Completed sell orders</h3>
-                    {this.state.completedSellOrdersHtml}
+                    <div>
+                        <h3>Completed sell orders</h3>
+                        {this.state.completedSellOrdersHtml}
+                    </div>
 
-                    <h3>Completed buy orders</h3>
-                    {this.state.completedBuyOrdersHtml}
+                    <div>
+                        <h3>Completed buy orders</h3>
+                        {this.state.completedBuyOrdersHtml}
+                    </div>
                 </div>
             </div>
         )
