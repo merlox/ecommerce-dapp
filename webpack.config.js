@@ -18,12 +18,6 @@ module.exports = {
                     loader: 'babel-loader'
                 }
             }, {
-                test: /\.html$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'html-loader'
-                }
-            }, {
                 test: /\.styl$/,
                 exclude: /node_modules/,
                 use: [
