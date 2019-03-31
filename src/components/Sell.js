@@ -34,7 +34,7 @@ class Sell extends React.Component {
                     <input onChange={event => {
                         this.setState({image: event.target.value})
                     }} type="text" placeholder="Product image URL..." />
-                    <p>Note that shipping costs are considered free so add the price to the cost of the product itself</p>
+                    <p>Note that shipping costs are considered free so add the shipping price to the cost of the product itself</p>
                     <button onClick={() => {
                         this.props.publishProduct(this.state)
                     }} type="button">Publish product</button>

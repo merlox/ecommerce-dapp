@@ -7,6 +7,7 @@ import Product from './components/Product'
 import Sell from './components/Sell'
 import Header from './components/Header'
 import Buy from './components/Buy'
+import Orders from './components/Orders'
 
 import './index.styl'
 
@@ -133,6 +134,9 @@ class Main extends React.Component {
                     <Buy
                         product={this.state.product}
                     />
+                )} />
+                <Route path="/orders" render={() => (
+                    <Orders />
                 )} />
                 <Route path="/" exact render={context => (
                     <Home
