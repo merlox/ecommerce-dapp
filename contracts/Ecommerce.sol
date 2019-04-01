@@ -1,6 +1,6 @@
-pragma ^0.5.5;
+pragma solidity ^0.5.5;
 
-import solidity './ERC721.sol';
+import './ERC721.sol';
 
 /// @notice The Ecommerce Token that implements the ERC721 token with mint functions without burning to avoid problems
 /// @author Merunas Grincalaitis <merunasgrincalaitis@gmail.com>
@@ -33,7 +33,8 @@ contract Ecommerce {
         uint256 price;
         string image;
     }
-    struct Shipping {
+    struct Order {
+        uint256 id;
         string nameSurname;
         string lineOneDirection;
         string lineTwoDirection;
@@ -42,10 +43,6 @@ contract Ecommerce {
         uint256 postalCode;
         bytes32 country;
         uint256 phone;
-    }
-    struct Order {
-        Product product;
-        Shipping shipping;
         string state; // Either 'pending', 'completed'
     }
     // Seller address => products
@@ -81,7 +78,6 @@ contract Ecommerce {
     /// @param _title The title of the product
     /// @param _description The description of the product
     /// @param _price The price of the product in ETH
-    /// @param _quantity The amount of products a user gets
     /// @param _image The image URL of the product
     function publishProduct(string memory _title, string memory _description, uint256 _price, string memory _image) public {
         require(bytes(_title).length > 0, 'The title cannot be empty');
@@ -90,7 +86,7 @@ contract Ecommerce {
         require(bytes(_image).length > 0, 'The image cannot be empty');
 
         Product memory p = Product(lastId, _title, _description, now, msg.sender, _price, _image);
-        product.push(p);
+        products.push(p);
         sellerProducts[msg.sender].push(p);
         productById[lastId] = p;
         productExists[lastId] = true;
@@ -116,11 +112,10 @@ contract Ecommerce {
         require(_city.length > 0, 'The city must be set');
         require(_stateRegion.length > 0, 'The state or region must be set');
         require(_postalCode > 0, 'The postal code must be set');
-        require(bytes(_country).length > 0, 'The country must be set');
+        require(_country > 0, 'The country must be set');
 
         Product memory p = productById[_id];
-        Shipping memory s = Shipping(_nameSurname, _lineOneDirection, _lineTwoDirection, _city, _stateRegion, _postalCode, _country, _phone);
-        Order memory newOrder = Order(p, s, 'pending');
+        Order memory newOrder = Order(_id, _nameSurname, _lineOneDirection, _lineTwoDirection, _city, _stateRegion, _postalCode, _country, _phone, 'pending');
         require(msg.value >= p.price, "The payment must be larger or equal than the products price");
 
         // Return the excess ETH sent by the buyer
@@ -139,15 +134,16 @@ contract Ecommerce {
     /// @param _id The id of the order which is the same for the product id
     function markOrderCompleted(uint256 _id) public {
         Order memory order = orderById[_id];
-        require(order.product.owner == msg.sender, 'Only the seller can mark the order as completed');
+        Product memory product = productById[_id];
+        require(product.owner == msg.sender, 'Only the seller can mark the order as completed');
         order.state = 'completed';
 
         // Delete the seller order from the array of pending orders
-        for(uint256 i = 0; i < pendingSellerOrders[p.owner].length; i++) {
-            if(pendingSellerOrders[order.product.owner][i].id == order.id) {
+        for(uint256 i = 0; i < pendingSellerOrders[product.owner].length; i++) {
+            if(pendingSellerOrders[product.owner][i].id == _id) {
                 Order memory lastElement = orderById[lastPendingSellerOrder];
-                pendingSellerOrders[order.product.owner][i] = lastElement;
-                pendingSellerOrders[order.product.owner][i].length--;
+                pendingSellerOrders[product.owner][i] = lastElement;
+                pendingSellerOrders[product.owner].length--;
                 lastPendingSellerOrder--;
             }
         }
@@ -156,11 +152,11 @@ contract Ecommerce {
             if(pendingBuyerOrders[msg.sender][i].id == order.id) {
                 Order memory lastElement = orderById[lastPendingBuyerOrder];
                 pendingBuyerOrders[msg.sender][i] = lastElement;
-                pendingBuyerOrders[msg.sender][i].length--;
+                pendingBuyerOrders[msg.sender].length--;
                 lastPendingBuyerOrder--;
             }
         }
-        completedSellerOrders[order.product.owner].push(order);
+        completedSellerOrders[product.owner].push(order);
         completedBuyerOrders[msg.sender].push(order);
         orderById[_id] = order;
     }
