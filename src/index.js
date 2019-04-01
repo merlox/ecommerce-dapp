@@ -67,8 +67,8 @@ class Main extends React.Component {
                 image: 'http://www.cottageartcreations.com/wp-content/uploads/2017/09/white-shoes-aliexpress-com-buy-new-men-flat-shoes-spring-autumn-black-white-man-srjqhnn-.jpg'
             }],
             productsHtml: [],
-            productDetails: [],
             product: {},
+            contract: {},
         }
 
         this.setup()
