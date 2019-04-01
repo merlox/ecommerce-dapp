@@ -62,6 +62,10 @@ contract Ecommerce {
     mapping(address => Order[]) public pendingSellerOrders; // The products waiting to be fulfilled by the seller, used by sellers to check which orders have to be filled
     // Buyer address => products
     mapping(address => Order[]) public pendingBuyerOrders; // The products that the buyer purchased waiting to be sent
+    // Seller address => products
+    mapping(address => Order[]) public completedSellerOrders; // A history of past orders fulfilled by the seller
+    // Buyer address => products
+    mapping(address => Order[]) public completedBuyerOrders; // A history of past orders made by this buyer
     // Product id => product
     mapping(uint256 => Product) public productById;
     // Product id => order
@@ -74,8 +78,6 @@ contract Ecommerce {
     address public token;
     uint256 public lastPendingSellerOrder;
     uint256 public lastPendingBuyerOrder;
-    uint256 public productsLength;
-    uint256 public ordersLength;
 
     /// @notice To setup the address of the ERC-721 token to use for this contract
     /// @param _token The token address
@@ -100,7 +102,6 @@ contract Ecommerce {
         productById[lastId] = p;
         productExists[lastId] = true;
         EcommerceToken(token).mint(address(this), lastId); // Create a new token for this product which will be owned by this contract until sold
-        productsLength = products.length;
         lastId++;
     }
 
@@ -134,7 +135,6 @@ contract Ecommerce {
         pendingBuyerOrders[msg.sender].push(newOrder);
         orders.push(newOrder);
         orderById[_id] = newOrder;
-        ordersLength = orders.length;
         lastPendingSellerOrder = pendingSellerOrders[p.owner].length > 0 ? pendingSellerOrders[p.owner].length - 1 : 0;
         lastPendingBuyerOrder = pendingBuyerOrders[p.owner].length > 0 ? pendingBuyerOrders[p.owner].length - 1 : 0;
         EcommerceToken(token).transferFrom(p.owner, msg.sender, _id); // Transfer the product token to the new owner
@@ -167,7 +167,26 @@ contract Ecommerce {
                 lastPendingBuyerOrder--;
             }
         }
+        completedSellerOrders[product.owner].push(order);
+        completedBuyerOrders[msg.sender].push(order);
         orderById[_id] = order;
+    }
+
+    /// @notice To get the latest product ids so that we can get each product independently
+    /// @param _amount The number of products to get
+    /// @return uint256[] The array of ids for the latest products added
+    function getLatestProductIds(uint256 _amount) public view returns(uint256[] memory) {
+        // If you're requesting more products than available, return only the available
+        uint256 length = products.length;
+        uint256 counter = (_amount > length) ? length : _amount;
+        uint256 condition = (_amount > length) ? 0 : (length - _amount);
+        uint256[] memory ids = new uint256[](_amount > length ? _amount : length);
+        uint256 increment = 0;
+        // Loop backwards to get the most recent products first
+        for(int256 i = int256(counter); i >= int256(condition); i--) {
+            ids[increment] = products[uint256(i)].id;
+        }
+        return ids;
     }
 
     /// @notice To get a single product broken down by properties
@@ -182,5 +201,92 @@ contract Ecommerce {
         owner = p.owner;
         price = p.price;
         image = p.image;
+    }
+
+    /// @notice To get the latest ids for a specific type of order, if it's a seller type of order the _owner address must be the seller's
+    /// @param _type The type of order which can be 'pending-seller', 'pending-buyer', 'completed-seller' and 'completed-buyer'
+    /// @param _owner The address from which get the order data
+    /// @param _amount How many ids to get
+    /// @return uint256[] The most recent ids sorted from newest to oldest
+    function getLatestOrderIds(string memory _type, address _owner, uint256 _amount) public view returns(uint256[] memory) {
+        // If you're requesting more products than available, return only the available
+        uint256 length;
+        uint256 counter;
+        uint256 condition;
+        uint256[] memory ids;
+        uint256 increment = 0;
+
+        if(compareStrings(_type, 'pending-seller')) {
+            length = pendingSellerOrders[_owner].length;
+            counter = (_amount > length) ? length : _amount;
+            condition = (_amount > length) ? 0 : (length - _amount);
+            ids = new uint256[](_amount > length ? _amount : length);
+            for(int256 i = int256(counter); i >= int256(condition); i--) {
+                ids[increment] = uint256(pendingSellerOrders[_owner][uint256(i)].id);
+            }
+        } else if(compareStrings(_type, 'pending-buyer')) {
+            length = pendingBuyerOrders[_owner].length;
+            counter = (_amount > length) ? length : _amount;
+            condition = (_amount > length) ? 0 : (length - _amount);
+            ids = new uint256[](_amount > length ? _amount : length);
+            for(int256 i = int256(counter); i >= int256(condition); i--) {
+                ids[increment] = uint256(pendingBuyerOrders[_owner][uint256(i)].id);
+            }
+        } else if(compareStrings(_type, 'completed-seller')) {
+            length = completedSellerOrders[_owner].length;
+            counter = (_amount > length) ? length : _amount;
+            condition = (_amount > length) ? 0 : (length - _amount);
+            ids = new uint256[](_amount > length ? _amount : length);
+            for(int256 i = int256(counter); i >= int256(condition); i--) {
+                ids[increment] = uint256(completedSellerOrders[_owner][uint256(i)].id);
+            }
+        } else if(compareStrings(_type, 'completed-buyer')) {
+            length = completedBuyerOrders[_owner].length;
+            counter = (_amount > length) ? length : _amount;
+            condition = (_amount > length) ? 0 : (length - _amount);
+            ids = new uint256[](_amount > length ? _amount : length);
+            for(int256 i = int256(counter); i >= int256(condition); i--) {
+                ids[increment] = uint256(completedBuyerOrders[_owner][uint256(i)].id);
+            }
+        }
+
+        return ids;
+    }
+
+    /// @notice To get an individual order with all the parameters
+    /// @param _type The type of order which can be 'pending-seller', 'pending-buyer', 'completed-seller' and 'completed-buyer'
+    /// @param _owner The address from which get the order data
+    /// @param _id The order id
+    /// @return Returns all the parameters for that specific order
+    function getOrder(string memory _type, address _owner, uint256 _id) public view returns(uint256 id, string memory nameSurname, string memory lineOneDirection, string memory lineTwoDirection, bytes32 city, bytes32 stateRegion, uint256 postalCode, bytes32 country, uint256 phone, string memory state) {
+        Order memory o;
+        if(compareStrings(_type, 'pending-seller')) {
+            o = pendingSellerOrders[_owner][_id];
+        } else if(compareStrings(_type, 'pending-buyer')) {
+            o = pendingBuyerOrders[_owner][_id];
+        } else if(compareStrings(_type, 'completed-seller')) {
+            o = completedSellerOrders[_owner][_id];
+        } else if(compareStrings(_type, 'completed-buyer')) {
+            o = completedBuyerOrders[_owner][_id];
+        }
+
+        id = o.id;
+        nameSurname = o.nameSurname;
+        lineOneDirection = o.lineOneDirection;
+        lineTwoDirection = o.lineTwoDirection;
+        city = o.city;
+        stateRegion = o.stateRegion;
+        postalCode = o.postalCode;
+        country = o.country;
+        phone = o.phone;
+        state = o.state;
+    }
+
+    /// @notice To compare two strings since we can't use the normal operator in solidity
+    /// @param a The first string
+    /// @param b The second string
+    /// @return bool If they are equal or not
+    function compareStrings(string memory a, string memory b) public pure returns (bool) {
+       return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
 }
