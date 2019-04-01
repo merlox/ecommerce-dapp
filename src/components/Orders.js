@@ -61,30 +61,52 @@ class Orders extends Component {
 
     async getUserOrders() {}
 
+    async markAsCompleted(product) {}
+
     async displayOrders() {
         let pendingSellOrdersHtml = []
         let pendingBuyOrdersHtml = []
         let completedSellOrdersHtml = []
         let completedBuyOrdersHtml = []
         await this.state.sellOrders.asyncForEach(product => {
-            let html = (
-                <div key={product.id} className="product">
-                    <img className="product-image" src={product.image} />
-                    <div className="product-data">
-                        <h3 className="product-title">{product.title}</h3>
-                        <div className="product-state">State: {product.state}</div>
-                        <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
-                        <div className="product-price">{product.price} ETH</div>
-                        <div className="product-quantity">{product.quantity} units available</div>
-                        <button onClick={() => {
-                            this.props.setState({product})
-                            this.props.redirectTo('/product')
-                        }} className="product-view" type="button">View</button>
+            if(product.state == 'pending') {
+                pendingSellOrdersHtml.push(
+                    <div key={product.id} className="product">
+                        <img className="product-image" src={product.image} />
+                        <div className="product-data">
+                            <h3 className="product-title">{product.title}</h3>
+                            <div className="product-state">State: {product.state}</div>
+                            <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
+                            <div className="product-price">{product.price} ETH</div>
+                            <div className="product-quantity">{product.quantity} units available</div>
+                            <button className="small-view-button" onClick={() => {
+                                this.props.setState({product})
+                                this.props.redirectTo('/product')
+                            }} type="button">View</button>
+                            <button className="small-completed-button" onClick={() => {
+                                this.markAsCompleted(product)
+                            }} type="button">Mark as completed</button>
+                        </div>
                     </div>
-                </div>
-            )
-            if(product.state = 'pending') pendingSellOrdersHtml.push(html)
-            if(product.state = 'completed') completedSellOrdersHtml.push(html)
+                )
+            } else {
+                completedSellOrdersHtml.push(
+                    <div key={product.id} className="product">
+                        <img className="product-image" src={product.image} />
+                        <div className="product-data">
+                            <h3 className="product-title">{product.title}</h3>
+                            <div className="product-state">State: {product.state}</div>
+                            <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
+                            <div className="product-price">{product.price} ETH</div>
+                            <div className="product-quantity">{product.quantity} units available</div>
+                            <button onClick={() => {
+                                this.props.setState({product})
+                                this.props.redirectTo('/product')
+                            }} className="product-view" type="button">View</button>
+                        </div>
+                    </div>
+                )
+            }
         })
         await this.state.buyOrders.asyncForEach(product => {
             let html = (
@@ -93,7 +115,6 @@ class Orders extends Component {
                     <div className="product-data">
                         <h3 className="product-title">{product.title}</h3>
                         <div className="product-state">State: {product.state}</div>
-                        <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
                         <div className="product-price">{product.price} ETH</div>
                         <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
@@ -103,8 +124,9 @@ class Orders extends Component {
                     </div>
                 </div>
             )
-            if(product.state = 'pending') pendingBuyOrdersHtml.push(html)
-            if(product.state = 'completed') completedBuyOrdersHtml.push(html)
+
+            if(product.state == 'pending') pendingBuyOrdersHtml.push(html)
+            else completedBuyOrdersHtml.push(html)
         })
         this.setState({pendingSellOrdersHtml, pendingBuyOrdersHtml, completedSellOrdersHtml, completedBuyOrdersHtml})
     }
@@ -138,6 +160,5 @@ class Orders extends Component {
         )
     }
 }
-
 
 export default Orders
