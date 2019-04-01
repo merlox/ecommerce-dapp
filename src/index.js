@@ -48,7 +48,6 @@ class Main extends React.Component {
                 date: Date.now(),
                 owner: '',
                 price: 12,
-                quantity: 10,
                 image: 'https://cdn.shopify.com/s/files/1/2494/8702/products/Bjakin-2018-Socks-Running-Shoes-for-Men-Lightweight-Sports-Sneakers-Colors-Man-Sock-Walking-Shoes-Big_17fa0d5b-d9d9-46a0-bdea-ac2dc17474ce_400x.jpg?v=1537755930'
             }, {
                 id: 2,
@@ -57,7 +56,6 @@ class Main extends React.Component {
                 date: Date.now(),
                 owner: '',
                 price: 62,
-                quantity: 10,
                 image: 'https://ae01.alicdn.com/kf/HTB10VmYPFXXXXckXFXXq6xXFXXXY/Spring-and-Autumn-Flats-Women-Flat-heel-Shoes-Fashion-Leopard-Flats-Women-Shoes-Casual-Soft-Comfortable.jpg_640x640.jpg'
             }, {
                 id: 3,
@@ -66,7 +64,6 @@ class Main extends React.Component {
                 date: Date.now(),
                 owner: '',
                 price: 28,
-                quantity: 10,
                 image: 'http://www.cottageartcreations.com/wp-content/uploads/2017/09/white-shoes-aliexpress-com-buy-new-men-flat-shoes-spring-autumn-black-white-man-srjqhnn-.jpg'
             }],
             productsHtml: [],
@@ -109,7 +106,6 @@ class Main extends React.Component {
                         <h3 className="product-title">{product.title}</h3>
                         <div className="product-description">{product.description.substring(0, 50) + '...'}</div>
                         <div className="product-price">{product.price} ETH</div>
-                        <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
                             this.setState({product})
                             this.redirectTo('/product')

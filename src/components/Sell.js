@@ -8,7 +8,6 @@ class Sell extends React.Component {
             title: '',
             description: '',
             price: '',
-            quantity: '',
             image: '',
         }
     }
@@ -28,9 +27,6 @@ class Sell extends React.Component {
                     <input onChange={event => {
                         this.setState({price: event.target.value})
                     }} type="text" placeholder="Product price in ETH..." />
-                    <input onChange={event => {
-                        this.setState({quantity: event.target.value})
-                    }} type="text" placeholder="Product quantity..." />
                     <input onChange={event => {
                         this.setState({image: event.target.value})
                     }} type="text" placeholder="Product image URL..." />

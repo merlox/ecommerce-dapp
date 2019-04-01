@@ -18,7 +18,6 @@ class Product extends React.Component {
                         </ul>
                         <div className="product-data-container">
                             <div className="product-price">{this.props.product.price} ETH</div>
-                            <div className="product-quantity">{this.props.product.quantity} units available</div>
                         </div>
                         <button onClick={() => {
                             this.props.redirectTo('/buy')

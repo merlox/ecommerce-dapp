@@ -14,7 +14,6 @@ class Orders extends Component {
                 date: Date.now(),
                 owner: '',
                 price: 12,
-                quantity: 10,
                 image: 'https://cdn.shopify.com/s/files/1/2494/8702/products/Bjakin-2018-Socks-Running-Shoes-for-Men-Lightweight-Sports-Sneakers-Colors-Man-Sock-Walking-Shoes-Big_17fa0d5b-d9d9-46a0-bdea-ac2dc17474ce_400x.jpg?v=1537755930',
                 purchasedAt: Date.now(),
                 state: 'completed',
@@ -25,7 +24,6 @@ class Orders extends Component {
                 date: Date.now(),
                 owner: '',
                 price: 28,
-                quantity: 10,
                 image: 'http://www.cottageartcreations.com/wp-content/uploads/2017/09/white-shoes-aliexpress-com-buy-new-men-flat-shoes-spring-autumn-black-white-man-srjqhnn-.jpg',
                 state: 'pending',
             }],
@@ -36,7 +34,6 @@ class Orders extends Component {
                 date: Date.now(),
                 owner: '',
                 price: 62,
-                quantity: 10,
                 image: 'https://ae01.alicdn.com/kf/HTB10VmYPFXXXXckXFXXq6xXFXXXY/Spring-and-Autumn-Flats-Women-Flat-heel-Shoes-Fashion-Leopard-Flats-Women-Shoes-Casual-Soft-Comfortable.jpg_640x640.jpg',
                 state: 'pending',
             }, {
@@ -46,7 +43,6 @@ class Orders extends Component {
                 date: Date.now(),
                 owner: '',
                 price: 28,
-                quantity: 10,
                 image: 'http://www.cottageartcreations.com/wp-content/uploads/2017/09/white-shoes-aliexpress-com-buy-new-men-flat-shoes-spring-autumn-black-white-man-srjqhnn-.jpg',
                 state: 'completed',
             }],
@@ -78,7 +74,6 @@ class Orders extends Component {
                             <div className="product-state">State: {product.state}</div>
                             <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
                             <div className="product-price">{product.price} ETH</div>
-                            <div className="product-quantity">{product.quantity} units available</div>
                             <button className="small-view-button" onClick={() => {
                                 this.props.setState({product})
                                 this.props.redirectTo('/product')
@@ -98,7 +93,6 @@ class Orders extends Component {
                             <div className="product-state">State: {product.state}</div>
                             <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
                             <div className="product-price">{product.price} ETH</div>
-                            <div className="product-quantity">{product.quantity} units available</div>
                             <button onClick={() => {
                                 this.props.setState({product})
                                 this.props.redirectTo('/product')
@@ -117,7 +111,6 @@ class Orders extends Component {
                         <div className="product-state">State: {product.state}</div>
                         <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
                         <div className="product-price">{product.price} ETH</div>
-                        <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
                             this.props.setState({product})
                             this.props.redirectTo('/product')
