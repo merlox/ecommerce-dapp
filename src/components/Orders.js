@@ -74,7 +74,7 @@ class Orders extends Component {
                     <div key={product.id} className="product">
                         <img className="product-image" src={product.image} />
                         <div className="product-data">
-                            <h3 className="product-title">{product.title}</h3>
+                            <h3 className="small-product-title">{product.title}</h3>
                             <div className="product-state">State: {product.state}</div>
                             <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
                             <div className="product-price">{product.price} ETH</div>
@@ -115,6 +115,7 @@ class Orders extends Component {
                     <div className="product-data">
                         <h3 className="product-title">{product.title}</h3>
                         <div className="product-state">State: {product.state}</div>
+                        <div className="product-description">{product.description.substring(0, 15) + '...'}</div>
                         <div className="product-price">{product.price} ETH</div>
                         <div className="product-quantity">{product.quantity} units available</div>
                         <button onClick={() => {
