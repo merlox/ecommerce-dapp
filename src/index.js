@@ -10,6 +10,7 @@ import Buy from './components/Buy'
 import Orders from './components/Orders'
 
 import './index.styl'
+import ABI from '../build/contracts/Ecommerce.json'
 
 // A marketplace to sell all kinds of products with ERC 721 tokens.
 // - A main page to see the most recent products
@@ -68,7 +69,6 @@ class Main extends React.Component {
             }],
             productsHtml: [],
             product: {},
-            contract: {},
         }
 
         this.setup()
@@ -92,8 +92,12 @@ class Main extends React.Component {
             products[i] = this.state.products[i]
             products[i].owner = user
         }
+        window.contract = new myWeb3.eth.Contract(ABI.abi, ABI.networks['3'].address, {
+            from: user
+        })
         this.setState({products})
-        this.displayProducts()
+        await this.getLatestProducts(9)
+        await this.displayProducts()
     }
 
     async displayProducts() {
@@ -123,7 +127,9 @@ class Main extends React.Component {
 		})
 	}
 
-    async publishProduct(data) {}
+    async getLatestProducts(amount) {
+        
+    }
 
     render() {
         return (

@@ -12,6 +12,15 @@ class Sell extends React.Component {
         }
     }
 
+    async publishProduct() {
+        if(this.state.title.length == 0) return alert('You must set the title before publishing the product')
+        if(this.state.description.length == 0) return alert('You must set the description before publishing the product')
+        if(this.state.price.length == 0) return alert('You must set the price before publishing the product')
+        if(this.state.image.length == 0) return alert('You must set the image URL before publishing the product')
+
+        await contract.methods.publishProduct(this.state.title, this.state.description, this.state.price, this.state.image).send()
+    }
+
     render() {
         return (
             <div>
@@ -32,7 +41,7 @@ class Sell extends React.Component {
                     }} type="text" placeholder="Product image URL..." />
                     <p>Note that shipping costs are considered free so add the shipping price to the cost of the product itself</p>
                     <button onClick={() => {
-                        this.props.publishProduct(this.state)
+                        this.publishProduct(this.state)
                     }} type="button">Publish product</button>
                 </div>
             </div>

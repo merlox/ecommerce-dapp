@@ -2,14 +2,25 @@ pragma solidity ^0.5.0;
 
 import './ERC721.sol';
 
-/// @notice The Ecommerce Token that implements the ERC721 token with mint functions without burning to avoid problems
+/// @notice The Ecommerce Token that implements the ERC721 token with mint function
 /// @author Merunas Grincalaitis <merunasgrincalaitis@gmail.com>
 contract EcommerceToken is ERC721 {
+    address public ecommerce;
+    bool public isEcommerceSet = false;
     /// @notice To generate a new token for the specified address
     /// @param _to The receiver of this new token
     /// @param _tokenId The new token id, must be unique
     function mint(address _to, uint256 _tokenId) public {
+        require(msg.sender == ecommerce, 'Only the ecommerce contract can mint new tokens');
         _mint(_to, _tokenId);
+    }
+
+    /// @notice To set the ecommerce smart contract address
+    function setEcommerce(address _ecommerce) public {
+        require(!isEcommerceSet, 'The ecommerce address can only be set once');
+        require(_ecommerce != address(0), 'The ecommerce address cannot be empty');
+        isEcommerceSet = true;
+        ecommerce = _ecommerce;
     }
 }
 
@@ -159,5 +170,123 @@ contract Ecommerce {
         completedSellerOrders[product.owner].push(order);
         completedBuyerOrders[msg.sender].push(order);
         orderById[_id] = order;
+    }
+
+    /// @notice To get the latest product ids so that we can get each product independently
+    /// @param _amount The number of products to get
+    /// @return uint256[] The array of ids for the latest products added
+    function getLatestProductIds(uint256 _amount) public view returns(uint256[] memory) {
+        // If you're requesting more products than available, return only the available
+        uint256 length = products.length;
+        uint256 counter = (_amount > length) ? length : _amount;
+        uint256 condition = (_amount > length) ? 0 : (length - _amount);
+        uint256[] memory ids = new uint256[](_amount > length ? _amount : length);
+        uint256 increment = 0;
+        // Loop backwards to get the most recent products first
+        for(int256 i = int256(length); i >= condition; i--) {
+            ids[increment] = uint256(products[i].id);
+        }
+        return ids;
+    }
+
+    /// @notice To get a single product broken down by properties
+    /// @param _id The id of the product to get
+    /// @return The product properties including all of them
+    function getProduct(uint256 _id) public view returns(uint256 id, string memory title, string memory description, uint256 date, address payable owner, uint256 price, string memory image) {
+        Product memory p = productById[_id];
+        id = p.id;
+        title = p.title;
+        description = p.description;
+        date = p.date;
+        owner = p.owner;
+        price = p.price;
+        image = p.image;
+    }
+
+    /// @notice To get the latest ids for a specific type of order, if it's a seller type of order the _owner address must be the seller's
+    /// @param _type The type of order which can be 'pending-seller', 'pending-buyer', 'completed-seller' and 'completed-buyer'
+    /// @param _owner The address from which get the order data
+    /// @param _amount How many ids to get
+    /// @return uint256[] The most recent ids sorted from newest to oldest
+    function getLatestOrderIds(string memory _type, address _owner, uint256 _amount) public view returns(uint256[] memory) {
+        // If you're requesting more products than available, return only the available
+        uint256 length;
+        uint256 counter;
+        uint256 condition;
+        uint256[] memory ids;
+        uint256 increment = 0;
+
+        if(compareStrings(_type, 'pending-seller')) {
+            length = pendingSellerOrders[_owner].length;
+            counter = (_amount > length) ? _amount : length;
+            condition = (_amount > length) ? 0 : (length - _amount);
+            ids = new uint256[](_amount > length ? _amount : length);
+            for(int256 i = int256(counter); i >= condition; i--) {
+                ids[increment] = uint256(pendingSellerOrders[_owner][i].id);
+            }
+        } else if(compareStrings(_type, 'pending-buyer')) {
+            length = pendingBuyerOrders[_owner].length;
+            counter = (_amount > length) ? _amount : length;
+            condition = (_amount > length) ? 0 : (length - _amount);
+            ids = new uint256[](_amount > length ? _amount : length);
+            for(int256 i = int256(counter); i >= condition; i--) {
+                ids[increment] = uint256(pendingBuyerOrders[_owner][i].id);
+            }
+        } else if(compareStrings(_type, 'completed-seller')) {
+            length = completedSellerOrders[_owner].length;
+            counter = (_amount > length) ? _amount : length;
+            condition = (_amount > length) ? 0 : (length - _amount);
+            ids = new uint256[](_amount > length ? _amount : length);
+            for(int256 i = int256(counter); i >= condition; i--) {
+                ids[increment] = uint256(completedSellerOrders[_owner][i].id);
+            }
+        } else if(compareStrings(_type, 'completed-buyer')) {
+            length = completedBuyerOrders[_owner].length;
+            counter = (_amount > length) ? _amount : length;
+            condition = (_amount > length) ? 0 : (length - _amount);
+            ids = new uint256[](_amount > length ? _amount : length);
+            for(int256 i = int256(counter); i >= condition; i--) {
+                ids[increment] = uint256(completedBuyerOrders[_owner][i].id);
+            }
+        }
+
+        return ids;
+    }
+
+    /// @notice To get an individual order with all the parameters
+    /// @param _type The type of order which can be 'pending-seller', 'pending-buyer', 'completed-seller' and 'completed-buyer'
+    /// @param _owner The address from which get the order data
+    /// @param _id The order id
+    /// @return Returns all the parameters for that specific order
+    function getOrder(string memory _type, address _owner, uint256 _id) public view returns(uint256 id, string memory nameSurname, string memory lineOneDirection, string memory lineTwoDirection, bytes32 city, bytes32 stateRegion, uint256 postalCode, bytes32 country, uint256 phone, string memory state) {
+        Order memory o;
+        if(compareStrings(_type, 'pending-seller')) {
+            o = pendingSellerOrders[_owner][_id];
+        } else if(compareStrings(_type, 'pending-buyer')) {
+            o = pendingBuyerOrders[_owner][_id];
+        } else if(compareStrings(_type, 'completed-seller')) {
+            o = completedSellerOrders[_owner][_id];
+        } else if(compareStrings(_type, 'completed-buyer')) {
+            o = completedBuyerOrders[_owner][_id];
+        }
+
+        id = o.id;
+        nameSurname = o.nameSurname;
+        lineOneDirection = o.lineOneDirection;
+        lineTwoDirection = o.lineTwoDirection;
+        city = o.city;
+        stateRegion = o.stateRegion;
+        postalCode = o.postalCode;
+        country = o.country;
+        phone = o.phone;
+        state = o.state;
+    }
+
+    /// @notice To compare two strings since we can't use the normal operator in solidity
+    /// @param a The first string
+    /// @param b The second string
+    /// @return bool If they are equal or not
+    function compareStrings(string memory a, string memory b) public pure returns (bool) {
+       return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
 }
