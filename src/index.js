@@ -127,6 +127,8 @@ class Main extends React.Component {
 		})
 	}
 
+    async publishProduct(data) {}
+
     render() {
         return (
             <div>
@@ -137,7 +139,9 @@ class Main extends React.Component {
                     />
                 )}/>
                 <Route path="/sell" render={() => (
-                    <Sell />
+                    <Sell
+                        publishProduct={data => this.publishProduct(data)}
+                    />
                 )}/>
                 <Route path="/buy" render={() => (
                     <Buy
