@@ -50,10 +50,6 @@ class Main extends React.Component {
         this.setup()
     }
 
-    bytes32(name) {
-        return myWeb3.utils.fromAscii(name)
-    }
-
     async setup() {
         // Create the contract instance
         window.myWeb3 = new MyWeb3(ethereum)
@@ -119,7 +115,7 @@ class Main extends React.Component {
                 description: product.description,
                 image: product.image,
                 owner: product.owner,
-                price: parseInt(product.price),
+                price: myWeb3.utils.fromWei(String(product.price)),
             }
             products.push(product)
         }

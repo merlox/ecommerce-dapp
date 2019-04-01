@@ -15,6 +15,15 @@ class Buy extends Component {
             phone: '',
         }
     }
+
+    bytes32(name) {
+        return myWeb3.utils.fromAscii(name)
+    }
+
+    async buyProduct() {
+        await contract.methods.buyProduct(this.props.product.id, this.state.nameSurname, this.state.lineOneDirection, this.state.lineTwoDirection, this.bytes32(this.state.city), this.bytes32(this.state.stateRegion), this.state.postalCode, this.bytes32(this.state.country), this.state.phone).send()
+    }
+
     render() {
         return (
             <div>
@@ -53,7 +62,9 @@ class Buy extends Component {
                     <input onChange={e => {
                         this.setState({phone: e.target.value})
                     }} placeholder="Phone..." type="number" />
-                    <button>Buy now to this address</button>
+                    <button onClick={() => {
+                        this.buyProduct()
+                    }}>Buy now to this address</button>
                 </div>
             </div>
         )
