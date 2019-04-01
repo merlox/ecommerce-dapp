@@ -85,16 +85,16 @@ contract Ecommerce {
         require(_price > 0, 'The price cannot be empty');
         require(bytes(_image).length > 0, 'The image cannot be empty');
 
-        Product memory p = Product(lastId, _title, _description, now, msg.sender, _price, _image);
+        Product memory p = Product(lastId, _title, _description, now, msg.sender, _price * 1e18 , _image);
         products.push(p);
         sellerProducts[msg.sender].push(p);
         productById[lastId] = p;
         productExists[lastId] = true;
-        EcommerceToken(token).mint(msg.sender, lastId); // Create a new token for this product
+        EcommerceToken(token).mint(address(this), lastId); // Create a new token for this product which will be owned by this contract until sold
         lastId++;
     }
 
-    /// @notice To buy a new product
+    /// @notice To buy a new product, note that the seller must authorize this contract to manage the token
     /// @param _id The id of the product to buy
     /// @param _nameSurname The name and surname of the buyer
     /// @param _lineOneDirection The first line for the user address
@@ -124,8 +124,8 @@ contract Ecommerce {
         pendingBuyerOrders[msg.sender].push(newOrder);
         orders.push(newOrder);
         orderById[_id] = newOrder;
-        lastPendingSellerOrder = pendingSellerOrders[p.owner].length - 1;
-        lastPendingBuyerOrder = pendingBuyerOrders[p.owner].length - 1;
+        lastPendingSellerOrder = pendingSellerOrders[p.owner].length > 0 ? pendingSellerOrders[p.owner].length - 1 : 0;
+        lastPendingBuyerOrder = pendingBuyerOrders[p.owner].length > 0 ? pendingBuyerOrders[p.owner].length - 1 : 0;
         EcommerceToken(token).transferFrom(p.owner, msg.sender, _id); // Transfer the product token to the new owner
         p.owner.transfer(p.price);
     }
