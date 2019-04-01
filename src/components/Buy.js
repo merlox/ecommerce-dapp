@@ -21,7 +21,9 @@ class Buy extends Component {
     }
 
     async buyProduct() {
-        await contract.methods.buyProduct(this.props.product.id, this.state.nameSurname, this.state.lineOneDirection, this.state.lineTwoDirection, this.bytes32(this.state.city), this.bytes32(this.state.stateRegion), this.state.postalCode, this.bytes32(this.state.country), this.state.phone).send()
+        await contract.methods.buyProduct(this.props.product.id, this.state.nameSurname, this.state.lineOneDirection, this.state.lineTwoDirection, this.bytes32(this.state.city), this.bytes32(this.state.stateRegion), this.state.postalCode, this.bytes32(this.state.country), this.state.phone).send({
+            value: myWeb3.utils.toWei(this.props.product.price)
+        })
     }
 
     render() {

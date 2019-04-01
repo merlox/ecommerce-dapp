@@ -66,8 +66,6 @@ contract Ecommerce {
     mapping(uint256 => Product) public productById;
     // Product id => order
     mapping(uint256 => Order) public orderById;
-    // Product id => true or false
-    mapping(uint256 => bool) public productExists;
     Product[] public products;
     Order[] public orders;
     uint256 public lastId;
@@ -98,7 +96,6 @@ contract Ecommerce {
         products.push(p);
         sellerProducts[msg.sender].push(p);
         productById[lastId] = p;
-        productExists[lastId] = true;
         EcommerceToken(token).mint(address(this), lastId); // Create a new token for this product which will be owned by this contract until sold
         productsLength = products.length;
         lastId++;
@@ -116,7 +113,6 @@ contract Ecommerce {
     /// @param _phone The optional phone number for the shipping company
     function buyProduct(uint256 _id, string memory _nameSurname, string memory _lineOneDirection, string memory _lineTwoDirection, bytes32 _city, bytes32 _stateRegion, uint256 _postalCode, bytes32 _country, uint256 _phone) public payable {
         // The line 2 address and phone are optional, the rest are mandatory
-        require(productExists[_id], 'The product must exist to be purchased');
         require(bytes(_nameSurname).length > 0, 'The name and surname must be set');
         require(bytes(_lineOneDirection).length > 0, 'The line one direction must be set');
         require(_city.length > 0, 'The city must be set');
@@ -125,6 +121,7 @@ contract Ecommerce {
         require(_country > 0, 'The country must be set');
 
         Product memory p = productById[_id];
+        require(bytes(p.title).length > 0, 'The product must exist to be purchased');
         Order memory newOrder = Order(_id, _nameSurname, _lineOneDirection, _lineTwoDirection, _city, _stateRegion, _postalCode, _country, _phone, 'pending');
         require(msg.value >= p.price, "The payment must be larger or equal than the products price");
 
@@ -137,7 +134,7 @@ contract Ecommerce {
         ordersLength = orders.length;
         lastPendingSellerOrder = pendingSellerOrders[p.owner].length > 0 ? pendingSellerOrders[p.owner].length - 1 : 0;
         lastPendingBuyerOrder = pendingBuyerOrders[p.owner].length > 0 ? pendingBuyerOrders[p.owner].length - 1 : 0;
-        EcommerceToken(token).transferFrom(p.owner, msg.sender, _id); // Transfer the product token to the new owner
+        EcommerceToken(token).transferFrom(address(this), msg.sender, _id); // Transfer the product token to the new owner
         p.owner.transfer(p.price);
     }
 
