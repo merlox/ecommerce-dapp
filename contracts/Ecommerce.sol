@@ -183,8 +183,8 @@ contract Ecommerce {
         uint256[] memory ids = new uint256[](_amount > length ? _amount : length);
         uint256 increment = 0;
         // Loop backwards to get the most recent products first
-        for(int256 i = int256(length); i >= condition; i--) {
-            ids[increment] = uint256(products[i].id);
+        for(int256 i = int256(counter); i >= int256(condition); i--) {
+            ids[increment] = products[uint256(i)].id;
         }
         return ids;
     }
@@ -218,35 +218,35 @@ contract Ecommerce {
 
         if(compareStrings(_type, 'pending-seller')) {
             length = pendingSellerOrders[_owner].length;
-            counter = (_amount > length) ? _amount : length;
+            counter = (_amount > length) ? length : _amount;
             condition = (_amount > length) ? 0 : (length - _amount);
             ids = new uint256[](_amount > length ? _amount : length);
-            for(int256 i = int256(counter); i >= condition; i--) {
-                ids[increment] = uint256(pendingSellerOrders[_owner][i].id);
+            for(int256 i = int256(counter); i >= int256(condition); i--) {
+                ids[increment] = uint256(pendingSellerOrders[_owner][uint256(i)].id);
             }
         } else if(compareStrings(_type, 'pending-buyer')) {
             length = pendingBuyerOrders[_owner].length;
-            counter = (_amount > length) ? _amount : length;
+            counter = (_amount > length) ? length : _amount;
             condition = (_amount > length) ? 0 : (length - _amount);
             ids = new uint256[](_amount > length ? _amount : length);
-            for(int256 i = int256(counter); i >= condition; i--) {
-                ids[increment] = uint256(pendingBuyerOrders[_owner][i].id);
+            for(int256 i = int256(counter); i >= int256(condition); i--) {
+                ids[increment] = uint256(pendingBuyerOrders[_owner][uint256(i)].id);
             }
         } else if(compareStrings(_type, 'completed-seller')) {
             length = completedSellerOrders[_owner].length;
-            counter = (_amount > length) ? _amount : length;
+            counter = (_amount > length) ? length : _amount;
             condition = (_amount > length) ? 0 : (length - _amount);
             ids = new uint256[](_amount > length ? _amount : length);
-            for(int256 i = int256(counter); i >= condition; i--) {
-                ids[increment] = uint256(completedSellerOrders[_owner][i].id);
+            for(int256 i = int256(counter); i >= int256(condition); i--) {
+                ids[increment] = uint256(completedSellerOrders[_owner][uint256(i)].id);
             }
         } else if(compareStrings(_type, 'completed-buyer')) {
             length = completedBuyerOrders[_owner].length;
-            counter = (_amount > length) ? _amount : length;
+            counter = (_amount > length) ? length : _amount;
             condition = (_amount > length) ? 0 : (length - _amount);
             ids = new uint256[](_amount > length ? _amount : length);
-            for(int256 i = int256(counter); i >= condition; i--) {
-                ids[increment] = uint256(completedBuyerOrders[_owner][i].id);
+            for(int256 i = int256(counter); i >= int256(condition); i--) {
+                ids[increment] = uint256(completedBuyerOrders[_owner][uint256(i)].id);
             }
         }
 
