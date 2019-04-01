@@ -1,6 +1,6 @@
 pragma ^0.5.5;
 
-import './ERC721.sol';
+import solidity './ERC721.sol';
 
 /// @notice The Ecommerce Token that implements the ERC721 token with mint functions without burning to avoid problems
 /// @author Merunas Grincalaitis <merunasgrincalaitis@gmail.com>
@@ -44,9 +44,9 @@ contract Ecommerce {
         uint256 phone;
     }
     struct Order {
-        Product p;
-        Shipping s;
-        string state; // Either 'published', 'pending', 'completed'
+        Product product;
+        Shipping shipping;
+        string state; // Either 'pending', 'completed'
     }
     // Seller address => products
     mapping(address => Product[]) public sellerProducts; // The published products by the seller
@@ -60,12 +60,16 @@ contract Ecommerce {
     mapping(address => Order[]) public completedBuyerOrders; // A history of past orders made by this buyer
     // Product id => product
     mapping(uint256 => Product) public productById;
+    // Product id => order
+    mapping(uint256 => Order) public orderById;
     // Product id => true or false
     mapping(uint256 => bool) public productExists;
     Product[] public products;
     Order[] public orders;
     uint256 public lastId;
     address public token;
+    uint256 public lastPendingSellerOrder;
+    uint256 public lastPendingBuyerOrder;
 
     /// @notice To setup the address of the ERC-721 token to use for this contract
     /// @param _token The token address
@@ -85,7 +89,7 @@ contract Ecommerce {
         require(_price > 0, 'The price cannot be empty');
         require(bytes(_image).length > 0, 'The image cannot be empty');
 
-        Product p = Product(lastId, _title, _description, now, msg.sender, _price, _image);
+        Product memory p = Product(lastId, _title, _description, now, msg.sender, _price, _image);
         product.push(p);
         sellerProducts[msg.sender].push(p);
         productById[lastId] = p;
@@ -95,6 +99,15 @@ contract Ecommerce {
     }
 
     /// @notice To buy a new product
+    /// @param _id The id of the product to buy
+    /// @param _nameSurname The name and surname of the buyer
+    /// @param _lineOneDirection The first line for the user address
+    /// @param _lineTwoDirection The second, optional user address line
+    /// @param _city Buyer's city
+    /// @param _stateRegion The state or region where the buyer lives
+    /// @param _postalCode The postal code of his location
+    /// @param _country Buyer's country
+    /// @param _phone The optional phone number for the shipping company
     function buyProduct(uint256 _id, string memory _nameSurname, string memory _lineOneDirection, string memory _lineTwoDirection, bytes32 _city, bytes32 _stateRegion, uint256 _postalCode, bytes32 _country, uint256 _phone) public payable {
         // The line 2 address and phone are optional, the rest are mandatory
         require(productExists[_id], 'The product must exist to be purchased');
@@ -105,6 +118,50 @@ contract Ecommerce {
         require(_postalCode > 0, 'The postal code must be set');
         require(bytes(_country).length > 0, 'The country must be set');
 
-        Product p = productById[_id];
+        Product memory p = productById[_id];
+        Shipping memory s = Shipping(_nameSurname, _lineOneDirection, _lineTwoDirection, _city, _stateRegion, _postalCode, _country, _phone);
+        Order memory newOrder = Order(p, s, 'pending');
+        require(msg.value >= p.price, "The payment must be larger or equal than the products price");
+
+        // Return the excess ETH sent by the buyer
+        if(msg.value > p.price) msg.sender.transfer(msg.value - p.price);
+        pendingSellerOrders[p.owner].push(newOrder);
+        pendingBuyerOrders[msg.sender].push(newOrder);
+        orders.push(newOrder);
+        orderById[_id] = newOrder;
+        lastPendingSellerOrder = pendingSellerOrders[p.owner].length - 1;
+        lastPendingBuyerOrder = pendingBuyerOrders[p.owner].length - 1;
+        EcommerceToken(token).transferFrom(p.owner, msg.sender, _id); // Transfer the product token to the new owner
+        p.owner.transfer(p.price);
+    }
+
+    /// @notice To mark an order as completed
+    /// @param _id The id of the order which is the same for the product id
+    function markOrderCompleted(uint256 _id) public {
+        Order memory order = orderById[_id];
+        require(order.product.owner == msg.sender, 'Only the seller can mark the order as completed');
+        order.state = 'completed';
+
+        // Delete the seller order from the array of pending orders
+        for(uint256 i = 0; i < pendingSellerOrders[p.owner].length; i++) {
+            if(pendingSellerOrders[order.product.owner][i].id == order.id) {
+                Order memory lastElement = orderById[lastPendingSellerOrder];
+                pendingSellerOrders[order.product.owner][i] = lastElement;
+                pendingSellerOrders[order.product.owner][i].length--;
+                lastPendingSellerOrder--;
+            }
+        }
+        // Delete the seller order from the array of pending orders
+        for(uint256 i = 0; i < pendingBuyerOrders[msg.sender].length; i++) {
+            if(pendingBuyerOrders[msg.sender][i].id == order.id) {
+                Order memory lastElement = orderById[lastPendingBuyerOrder];
+                pendingBuyerOrders[msg.sender][i] = lastElement;
+                pendingBuyerOrders[msg.sender][i].length--;
+                lastPendingBuyerOrder--;
+            }
+        }
+        completedSellerOrders[order.product.owner].push(order);
+        completedBuyerOrders[msg.sender].push(order);
+        orderById[_id] = order;
     }
 }
