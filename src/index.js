@@ -74,6 +74,11 @@ class Main extends React.Component {
 
     async displayProducts() {
         let productsHtml = []
+        if(this.state.products.length == 0) {
+            productsHtml = (
+                <div key="0" className="center">There are no products yet...</div>
+            )
+        }
         await this.state.products.asyncForEach(product => {
             productsHtml.push((
                 <div key={product.id} className="product">

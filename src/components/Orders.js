@@ -54,6 +54,7 @@ class Orders extends Component {
             let order = await contract.methods.completedOrders(user, i - 1).call()
             completedOrders.push(await this.generateOrderObject(order))
         }
+
         this.setState({pendingSellerOrders, pendingBuyerOrders, completedOrders})
     }
 
@@ -81,12 +82,31 @@ class Orders extends Component {
         return order
     }
 
-    async markAsCompleted(product) {}
+    async markAsCompleted(id) {
+        await contract.methods.markOrderCompleted(id).send()
+        await this.setup()
+    }
 
     async displayOrders() {
         let pendingSellerOrdersHtml = []
         let pendingBuyerOrdersHtml = []
         let completedOrdersHtml = []
+
+        if(this.state.pendingSellerOrders.length == 0) {
+            pendingSellerOrdersHtml.push((
+                <div key="0" className="center">There are no seller orders yet...</div>
+            ))
+        }
+        if(this.state.pendingBuyerOrders.length == 0) {
+            pendingBuyerOrdersHtml.push((
+                <div key="0" className="center">There are no buyer orders yet...</div>
+            ))
+        }
+        if(this.state.completedOrders.length == 0) {
+            completedOrdersHtml.push((
+                <div key="0" className="center">There are no completed orders yet...</div>
+            ))
+        }
 
         await this.state.pendingSellerOrders.asyncForEach(order => {
             pendingSellerOrdersHtml.push(
@@ -102,10 +122,12 @@ class Orders extends Component {
                             this.props.redirectTo('/product')
                         }} type="button">View</button>
                         <button className="small-completed-button" onClick={() => {
-                            this.markAsCompleted(product)
+                            this.markAsCompleted(order.id)
                         }} type="button">Mark as completed</button>
                     </div>
                     <div className="order-address">
+                        <div>Id</div>
+                        <div className="second-column" title={order.id}>{order.id}</div>
                         <div>Buyer</div>
                         <div className="second-column" title={order.buyer}>{order.buyer}</div>
                         <div>Name and surname</div>
@@ -145,6 +167,8 @@ class Orders extends Component {
                         }} className="product-view" type="button">View</button>
                     </div>
                     <div className="order-address">
+                        <div>Id</div>
+                        <div className="second-column" title={order.id}>{order.id}</div>
                         <div>Buyer</div>
                         <div className="second-column" title={order.buyer}>{order.buyer}</div>
                         <div>Name and surname</div>
@@ -184,6 +208,8 @@ class Orders extends Component {
                         }} className="product-view" type="button">View</button>
                     </div>
                     <div className="order-address">
+                        <div>Id</div>
+                        <div className="second-column" title={order.id}>{order.id}</div>
                         <div>Buyer</div>
                         <div className="second-column" title={order.buyer}>{order.buyer}</div>
                         <div>Name and surname</div>

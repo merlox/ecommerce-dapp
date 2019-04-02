@@ -79,7 +79,7 @@ contract Ecommerce {
         require(_price > 0, 'The price cannot be empty');
         require(bytes(_image).length > 0, 'The image cannot be empty');
 
-        Product memory p = Product(lastId, _title, _description, now, msg.sender, _price * 1e18 , _image);
+        Product memory p = Product(lastId, _title, _description, now, msg.sender, _price, _image);
         products.push(p);
         productById[lastId] = p;
         EcommerceToken(token).mint(address(this), lastId); // Create a new token for this product which will be owned by this contract until sold
@@ -145,11 +145,11 @@ contract Ecommerce {
             }
         }
         // Delete the seller order from the array of pending orders
-        for(uint256 i = 0; i < pendingBuyerOrders[msg.sender].length; i++) {
-            if(pendingBuyerOrders[msg.sender][i].id == order.id) {
-                Order memory lastElement = orderById[pendingBuyerOrders[msg.sender].length - 1];
-                pendingBuyerOrders[msg.sender][i] = lastElement;
-                pendingBuyerOrders[msg.sender].length--;
+        for(uint256 i = 0; i < pendingBuyerOrders[order.buyer].length; i++) {
+            if(pendingBuyerOrders[order.buyer][i].id == order.id) {
+                Order memory lastElement = orderById[pendingBuyerOrders[order.buyer].length - 1];
+                pendingBuyerOrders[order.buyer][i] = lastElement;
+                pendingBuyerOrders[order.buyer].length--;
             }
         }
         completedOrders[order.buyer].push(order);

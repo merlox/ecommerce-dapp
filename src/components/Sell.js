@@ -18,7 +18,7 @@ class Sell extends React.Component {
         if(this.state.price.length == 0) return alert('You must set the price before publishing the product')
         if(this.state.image.length == 0) return alert('You must set the image URL before publishing the product')
 
-        await contract.methods.publishProduct(this.state.title, this.state.description, this.state.price, this.state.image).send()
+        await contract.methods.publishProduct(this.state.title, this.state.description, myWeb3.utils.toWei(this.state.price), this.state.image).send()
     }
 
     render() {
