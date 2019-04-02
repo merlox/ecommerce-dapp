@@ -168,6 +168,9 @@ input, textarea
     >div:last-child
         margin-bottom: 100px
 
+    .completed-orders-container
+        grid-column: 1 / 3
+
     .order-title
         text-align: center
         font-size: 12pt
@@ -176,6 +179,7 @@ input, textarea
         display: grid
         margin-bottom: 20px
         grid-template-columns: 1fr 1fr
+        grid-gap: 15px
 
         .small-product-title
             margin-bottom: 20px
@@ -184,7 +188,6 @@ input, textarea
         .product-image
             height: 150px
             justify-self: right
-            margin-right: 20px
 
         .product-title
             margin-top: 0
@@ -199,6 +202,23 @@ input, textarea
 
         .small-completed-button
             height: 25px
+
+        .order-address
+            grid-column: 1 / 3
+            display: grid
+            grid-template-columns: repeat(2, 50%)
+            grid-column-gap: 15px
+
+            div
+                grid-column: 1 / 2
+                text-align: right
+                text-overflow: ellipsis
+                white-space: nowrap
+                overflow: hidden
+
+            div.second-column
+                grid-column: 2 / 3
+                text-align: left
 
         &:last-child
             margin-bottom: 40px
