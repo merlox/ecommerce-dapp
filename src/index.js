@@ -8,25 +8,8 @@ import Sell from './components/Sell'
 import Header from './components/Header'
 import Buy from './components/Buy'
 import Orders from './components/Orders'
-
 import './index.styl'
 import ABI from '../build/contracts/Ecommerce.json'
-
-// A marketplace to sell all kinds of products with ERC 721 tokens.
-// - A main page to see the most recent products
-// - A product page to see details for that product
-// - A sell page to publish new products
-// - A buy page to indicate where it will be sent
-
-// Each product will have the following properties
-// - Id
-// - Title
-// - Description
-// - Published date
-// - Owner
-// - Price in ETH
-// - Quantity
-// - Image URL
 
 Array.prototype.asyncForEach = function (callback) {
     return new Promise(resolve => {
@@ -59,11 +42,6 @@ class Main extends React.Component {
             console.error('You must approve this dApp to interact with it')
         }
         window.user = (await myWeb3.eth.getAccounts())[0]
-        let products = []
-        for(let i = 0; i < this.state.products.length; i++) {
-            products[i] = this.state.products[i]
-            products[i].owner = user
-        }
         window.contract = new myWeb3.eth.Contract(ABI.abi, ABI.networks['3'].address, {
             from: user
         })
@@ -99,10 +77,10 @@ class Main extends React.Component {
     }
 
     redirectTo(location) {
-		this.props.history.push({
-			pathname: location
-		})
-	}
+    	this.props.history.push({
+    		pathname: location
+    	})
+    }
 
     async getLatestProducts(amount) {
         // Get the product ids
@@ -160,7 +138,7 @@ class Main extends React.Component {
             </div>
         )
     }
-}
+    }
 
 // To be able to access the history in order to redirect users programatically when opening a product
 Main = withRouter(Main)
