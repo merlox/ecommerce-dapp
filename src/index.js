@@ -58,7 +58,7 @@ class Main extends React.Component {
         } catch (error) {
             console.error('You must approve this dApp to interact with it')
         }
-        const user = (await myWeb3.eth.getAccounts())[0]
+        window.user = (await myWeb3.eth.getAccounts())[0]
         let products = []
         for(let i = 0; i < this.state.products.length; i++) {
             products[i] = this.state.products[i]
@@ -101,7 +101,7 @@ class Main extends React.Component {
 
     async getLatestProducts(amount) {
         // Get the product ids
-        const productsLength = parseInt(await contract.methods.productsLength().call())
+        const productsLength = parseInt(await contract.methods.getProductsLength().call())
         let products = []
         let condition = (amount > productsLength) ? 0 : productsLength - amount
 

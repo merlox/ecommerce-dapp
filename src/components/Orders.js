@@ -51,11 +51,32 @@ class Orders extends Component {
             completedSellOrdersHtml: [],
             completedBuyOrdersHtml: [],
         }
-
-        this.displayOrders()
+        this.setup()
     }
 
-    async getUserOrders() {}
+    async setup() {
+        await this.getOrders(5)
+        await this.displayOrders()
+    }
+
+    async getOrders(amount) {
+        console.log('Called')
+        const pendingSellerOrdersLength = parseInt(await contract.methods.lastPendingSellerOrder().call())
+        const pendingBuyerOrdersLength = parseInt(await contract.methods.lastPendingSellerOrder().call())
+        const conditionSeller = (amount > pendingSellerOrdersLength) ? 0 : pendingSellerOrdersLength - amount
+        const conditionBuyer = (amount > pendingBuyerOrdersLength) ? 0 : pendingBuyerOrdersLength - amount
+        let pendingSellerOrders = []
+        let pendingBuyerOrders = []
+
+        console.log(pendingSellerOrdersLength, pendingBuyerOrdersLength, conditionSeller, pendingBuyerOrders)
+
+        // In reverse to get the most recent orders first
+        for(let i = pendingSellerOrdersLength; i > conditionSeller; i--) {
+            const order = await contract.methods.pendingSellerOrders(user, i - 1).call()
+            console.log('order', order)
+        }
+        // Get the orders and display the shipping address in a box
+    }
 
     async markAsCompleted(product) {}
 

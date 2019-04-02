@@ -27,14 +27,6 @@ contract EcommerceToken is ERC721 {
 /// @notice The main ecommerce contract to buy and sell ERC-721 tokens representing physical or digital products because we are dealing with non-fungible tokens, there will be only 1 stock per product
 /// @author Merunas Grincalaitis <merunasgrincalaitis@gmail.com>
 contract Ecommerce {
-    // We need the following:
-    /*
-        - A function to publish, sell products with unique token ids
-        - A function to buy products
-        - A function to mark purchased products as completed by the seller
-        - A function to get all the orders
-        - A function to get the recent products
-    */
     struct Product {
         uint256 id;
         string title;
@@ -46,6 +38,7 @@ contract Ecommerce {
     }
     struct Order {
         uint256 id;
+        address buyer;
         string nameSurname;
         string lineOneDirection;
         string lineTwoDirection;
@@ -57,23 +50,17 @@ contract Ecommerce {
         string state; // Either 'pending', 'completed'
     }
     // Seller address => products
-    mapping(address => Product[]) public sellerProducts; // The published products by the seller
-    // Seller address => products
     mapping(address => Order[]) public pendingSellerOrders; // The products waiting to be fulfilled by the seller, used by sellers to check which orders have to be filled
     // Buyer address => products
     mapping(address => Order[]) public pendingBuyerOrders; // The products that the buyer purchased waiting to be sent
+    mapping(address => Order[]) public completedOrders;
     // Product id => product
     mapping(uint256 => Product) public productById;
     // Product id => order
     mapping(uint256 => Order) public orderById;
     Product[] public products;
-    Order[] public orders;
     uint256 public lastId;
     address public token;
-    uint256 public lastPendingSellerOrder;
-    uint256 public lastPendingBuyerOrder;
-    uint256 public productsLength;
-    uint256 public ordersLength;
 
     /// @notice To setup the address of the ERC-721 token to use for this contract
     /// @param _token The token address
@@ -94,10 +81,8 @@ contract Ecommerce {
 
         Product memory p = Product(lastId, _title, _description, now, msg.sender, _price * 1e18 , _image);
         products.push(p);
-        sellerProducts[msg.sender].push(p);
         productById[lastId] = p;
         EcommerceToken(token).mint(address(this), lastId); // Create a new token for this product which will be owned by this contract until sold
-        productsLength = products.length;
         lastId++;
     }
 
@@ -122,18 +107,23 @@ contract Ecommerce {
 
         Product memory p = productById[_id];
         require(bytes(p.title).length > 0, 'The product must exist to be purchased');
-        Order memory newOrder = Order(_id, _nameSurname, _lineOneDirection, _lineTwoDirection, _city, _stateRegion, _postalCode, _country, _phone, 'pending');
+        Order memory newOrder = Order(_id, msg.sender, _nameSurname, _lineOneDirection, _lineTwoDirection, _city, _stateRegion, _postalCode, _country, _phone, 'pending');
         require(msg.value >= p.price, "The payment must be larger or equal than the products price");
+
+        // Delete the product from the array of products
+        for(uint256 i = 0; i < products.length; i++) {
+            if(products[i].id == _id) {
+                Product memory lastElement = products[products.length - 1];
+                products[i] = lastElement;
+                products.length--;
+            }
+        }
 
         // Return the excess ETH sent by the buyer
         if(msg.value > p.price) msg.sender.transfer(msg.value - p.price);
         pendingSellerOrders[p.owner].push(newOrder);
         pendingBuyerOrders[msg.sender].push(newOrder);
-        orders.push(newOrder);
         orderById[_id] = newOrder;
-        ordersLength = orders.length;
-        lastPendingSellerOrder = pendingSellerOrders[p.owner].length > 0 ? pendingSellerOrders[p.owner].length - 1 : 0;
-        lastPendingBuyerOrder = pendingBuyerOrders[p.owner].length > 0 ? pendingBuyerOrders[p.owner].length - 1 : 0;
         EcommerceToken(token).transferFrom(address(this), msg.sender, _id); // Transfer the product token to the new owner
         p.owner.transfer(p.price);
     }
@@ -149,35 +139,36 @@ contract Ecommerce {
         // Delete the seller order from the array of pending orders
         for(uint256 i = 0; i < pendingSellerOrders[product.owner].length; i++) {
             if(pendingSellerOrders[product.owner][i].id == _id) {
-                Order memory lastElement = orderById[lastPendingSellerOrder];
+                Order memory lastElement = orderById[pendingSellerOrders[product.owner].length - 1];
                 pendingSellerOrders[product.owner][i] = lastElement;
                 pendingSellerOrders[product.owner].length--;
-                lastPendingSellerOrder--;
             }
         }
         // Delete the seller order from the array of pending orders
         for(uint256 i = 0; i < pendingBuyerOrders[msg.sender].length; i++) {
             if(pendingBuyerOrders[msg.sender][i].id == order.id) {
-                Order memory lastElement = orderById[lastPendingBuyerOrder];
+                Order memory lastElement = orderById[pendingBuyerOrders[msg.sender].length - 1];
                 pendingBuyerOrders[msg.sender][i] = lastElement;
                 pendingBuyerOrders[msg.sender].length--;
-                lastPendingBuyerOrder--;
             }
         }
+        completedOrders[order.buyer] = order;
         orderById[_id] = order;
     }
 
-    /// @notice To get a single product broken down by properties
-    /// @param _id The id of the product to get
-    /// @return The product properties including all of them
-    function getProduct(uint256 _id) public view returns(uint256 id, string memory title, string memory description, uint256 date, address payable owner, uint256 price, string memory image) {
-        Product memory p = productById[_id];
-        id = p.id;
-        title = p.title;
-        description = p.description;
-        date = p.date;
-        owner = p.owner;
-        price = p.price;
-        image = p.image;
+    /// @notice Returns the product length
+    /// @return uint256 The number of products
+    function getProductsLength() public view returns(uint256) {
+        return products.length;
+    }
+
+    /// @notice To get the pending seller or buyer orders
+    /// @param _type If you want to get the pending seller, buyer or completed orders
+    /// @param _owner The owner of those orders
+    /// @return uint256 The number of orders to get
+    function getOrdersLength(bytes32 _type, address _owner) public view returns(uint256) {
+        if(_type == 'seller') return pendingSellerOrders[_owner].length;
+        else if(_type == 'buyer') return pendingBuyerOrders[_owner].length;
+        else if(_type == 'completed') return completedOrders[_owner].length;
     }
 }
