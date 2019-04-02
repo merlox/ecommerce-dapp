@@ -152,7 +152,7 @@ contract Ecommerce {
                 pendingBuyerOrders[msg.sender].length--;
             }
         }
-        completedOrders[order.buyer] = order;
+        completedOrders[order.buyer].push(order);
         orderById[_id] = order;
     }
 

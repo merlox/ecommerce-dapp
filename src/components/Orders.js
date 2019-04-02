@@ -54,28 +54,45 @@ class Orders extends Component {
         this.setup()
     }
 
+    bytes32(name) {
+        return myWeb3.utils.fromAscii(name)
+    }
+
     async setup() {
         await this.getOrders(5)
         await this.displayOrders()
     }
 
     async getOrders(amount) {
-        console.log('Called')
-        const pendingSellerOrdersLength = parseInt(await contract.methods.lastPendingSellerOrder().call())
-        const pendingBuyerOrdersLength = parseInt(await contract.methods.lastPendingSellerOrder().call())
+        const pendingSellerOrdersLength = parseInt(await contract.methods.getOrdersLength(this.bytes32('seller'), user).call())
+        const pendingBuyerOrdersLength = parseInt(await contract.methods.getOrdersLength(this.bytes32('buyer'), user).call())
+        const completedOrdersLength = parseInt(await contract.methods.getOrdersLength(this.bytes32('completed'), user).call())
+
         const conditionSeller = (amount > pendingSellerOrdersLength) ? 0 : pendingSellerOrdersLength - amount
         const conditionBuyer = (amount > pendingBuyerOrdersLength) ? 0 : pendingBuyerOrdersLength - amount
+        const conditionCompleted = (amount > completedOrdersLength) ? 0 : completedOrdersLength - amount
+
         let pendingSellerOrders = []
         let pendingBuyerOrders = []
-
-        console.log(pendingSellerOrdersLength, pendingBuyerOrdersLength, conditionSeller, pendingBuyerOrders)
+        let completedOrders = []
 
         // In reverse to get the most recent orders first
         for(let i = pendingSellerOrdersLength; i > conditionSeller; i--) {
             const order = await contract.methods.pendingSellerOrders(user, i - 1).call()
             console.log('order', order)
         }
+
+        for(let i = pendingBuyerOrdersLength; i > conditionBuyer; i--) {
+            const order = await contract.methods.pendingBuyerOrders(user, i - 1).call()
+            console.log('order', order)
+        }
+
+        for(let i = completedOrdersLength; i > conditionCompleted; i--) {
+            const order = await contract.methods.completedOrders(user, i - 1).call()
+            console.log('order', order)
+        }
         // Get the orders and display the shipping address in a box
+        // TODO Show the addresses and completed orders in one box instead of 2
     }
 
     async markAsCompleted(product) {}
