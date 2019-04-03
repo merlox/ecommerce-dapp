@@ -45,7 +45,6 @@ class Main extends React.Component {
         window.contract = new myWeb3.eth.Contract(ABI.abi, ABI.networks['3'].address, {
             from: user
         })
-        this.setState({products})
         await this.getLatestProducts(9)
         await this.displayProducts()
     }
