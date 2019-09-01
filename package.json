@@ -7,7 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "webpack-dev-server -d"
+    "dev": "webpack-dev-server -d",
+    "compile": "webpack -p",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
@@ -27,7 +29,7 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "truffle-hdwallet-provider": "^1.0.6",
-    "web3": "^1.0.0-beta.51",
+    "web3": "^1.2.1",
     "webpack": "^4.29.3",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.1"
